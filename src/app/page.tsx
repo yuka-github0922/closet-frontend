@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { uploadImage, createItem, imageUrl, type Item } from "@/lib/api";
 
+import { useEffect } from "react";
+import { getItems } from "@/lib/api";
 // ★ backendのEnum値に合わせる（ここ超大事）
 // 例：あなたのEnum定義に合わせて増やしてOK
 const CATEGORY_OPTIONS = [
@@ -82,10 +84,17 @@ export default function Page() {
   const [categories, setCategories] = useState<string[]>(["outer"]);
   const [colors, setColors] = useState<string[]>(["black", "white"]);
   const [seasons, setSeasons] = useState<string[]>(["winter"]);
+  const [items, setItems] = useState<Item[]>([]);
 
   const [file, setFile] = useState<File | null>(null);
   const [created, setCreated] = useState<Item | null>(null);
   const [log, setLog] = useState("");
+
+  useEffect(() => {
+  getItems()
+    .then(setItems)
+    .catch((e) => setLog(`load error: ${e.message}`));
+}, []);
 
   const onSubmit = async () => {
     try {
@@ -216,6 +225,56 @@ export default function Page() {
           </div>
         </div>
       )}
+      {items.length > 0 && (
+  <section style={{ marginTop: 32 }}>
+    <h2>登録済みアイテム一覧</h2>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: 16,
+        marginTop: 12,
+      }}
+    >
+      {items.map((item) => (
+        <div
+          key={item.id}
+          style={{
+            border: "1px solid #ddd",
+            padding: 8,
+            borderRadius: 8,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageUrl(item.image_path)}
+            alt={item.name}
+            style={{
+              width: "100%",
+              height: 160,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
+          />
+
+          <div style={{ marginTop: 8, fontWeight: 700 }}>
+            {item.name}
+          </div>
+
+          <div style={{ fontSize: 12, color: "#555" }}>
+            {item.categories.join(", ")}
+          </div>
+
+          <div style={{ fontSize: 12, color: "#777" }}>
+            {item.seasons.join(", ")}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
     </main>
   );
 }
