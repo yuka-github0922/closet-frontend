@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { uploadImage, createItem, imageUrl, type Item } from "@/lib/api";
+import { uploadImage, createItem, imageUrl, deleteItem, type Item } from "@/lib/api";
 
 import { useEffect } from "react";
 import { getItems } from "@/lib/api";
@@ -257,6 +257,16 @@ export default function Page() {
               borderRadius: 4,
             }}
           />
+
+          <button
+            onClick={async () => {
+              await deleteItem(item.id);
+              const latest = await getItems();
+              setItems(latest);
+            }}
+          >
+            削除
+          </button>
 
           <div style={{ marginTop: 8, fontWeight: 700 }}>
             {item.name}

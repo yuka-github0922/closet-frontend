@@ -42,3 +42,9 @@ export function imageUrl(path: string) {
   // path は "/uploads/xxx.png" みたいなのが来る想定
   return `${API_BASE}${path.startsWith("/") ? "" : "/"}${path}`;
 }
+
+export async function deleteItem(id: number) {
+  const res = await fetch(`${API_BASE}/items/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
