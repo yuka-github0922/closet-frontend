@@ -137,18 +137,30 @@ const [filterColor, setFilterColor] = useState<string>("");
   return true;
 });
 
-  return (
-    <main style={{ padding: 24, fontFamily: "sans-serif", maxWidth: 720 }}>
-      <h1>Closet MVP</h1>
-      <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+return (
+  <main className="min-h-screen bg-gray-50">
+    <div className="mx-auto max-w-3xl p-6 font-sans">
+      <h1 className="text-2xl font-bold">Closet</h1>
+      <p className="mt-1 text-sm text-gray-600">画像で服を管理するミニアプリ</p>
+
+      {/* フィルタ */}
+      <div className="mt-6 flex flex-wrap gap-3">
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          className="rounded-lg border bg-white px-3 py-2 text-sm"
+        >
           <option value="">カテゴリ：全部</option>
           <option value="outer">outer</option>
           <option value="tops">tops</option>
           <option value="bottoms">bottoms</option>
         </select>
 
-        <select value={filterSeason} onChange={(e) => setFilterSeason(e.target.value)}>
+        <select
+          value={filterSeason}
+          onChange={(e) => setFilterSeason(e.target.value)}
+          className="rounded-lg border bg-white px-3 py-2 text-sm"
+        >
           <option value="">季節：全部</option>
           <option value="spring">spring</option>
           <option value="summer">summer</option>
@@ -156,7 +168,11 @@ const [filterColor, setFilterColor] = useState<string>("");
           <option value="winter">winter</option>
         </select>
 
-        <select value={filterColor} onChange={(e) => setFilterColor(e.target.value)}>
+        <select
+          value={filterColor}
+          onChange={(e) => setFilterColor(e.target.value)}
+          className="rounded-lg border bg-white px-3 py-2 text-sm"
+        >
           <option value="">色：全部</option>
           <option value="black">black</option>
           <option value="white">white</option>
@@ -164,133 +180,153 @@ const [filterColor, setFilterColor] = useState<string>("");
         </select>
       </div>
 
-      <div style={{ marginTop: 12 }}>
-        <label style={{ display: "block", fontWeight: 700 }}>名前</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ border: "1px solid #ccc", padding: 8, width: "100%" }}
-        />
-      </div>
-
-      <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-        <div style={{ flex: 1 }}>
-          <label style={{ display: "block", fontWeight: 700 }}>サイズ</label>
+      {/* 入力フォーム */}
+      <div className="mt-6 space-y-4 rounded-2xl border bg-white p-5 shadow-sm">
+        <div>
+          <label className="block text-sm font-semibold">名前</label>
           <input
-            value={size}
-            onChange={(e) => setSize(e.target.value)}
-            style={{ border: "1px solid #ccc", padding: 8, width: "100%" }}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+            placeholder="例：黒白コート"
           />
         </div>
-        <div style={{ flex: 1 }}>
-          <label style={{ display: "block", fontWeight: 700 }}>素材</label>
-          <input
-            value={material}
-            onChange={(e) => setMaterial(e.target.value)}
-            style={{ border: "1px solid #ccc", padding: 8, width: "100%" }}
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label className="block text-sm font-semibold">サイズ</label>
+            <input
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+              placeholder="例：M"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold">素材</label>
+            <input
+              value={material}
+              onChange={(e) => setMaterial(e.target.value)}
+              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+              placeholder="例：wool"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <ToggleGroup
+            title={`カテゴリ（${categories.length}）`}
+            options={CATEGORY_OPTIONS}
+            values={categories}
+            onChange={setCategories}
+          />
+
+          <ToggleGroup
+            title={`色（${colors.length}）`}
+            options={COLOR_OPTIONS}
+            values={colors}
+            onChange={setColors}
+          />
+
+          <ToggleGroup
+            title={`季節（${seasons.length}）`}
+            options={SEASON_OPTIONS}
+            values={seasons}
+            onChange={setSeasons}
           />
         </div>
-      </div>
 
-      <ToggleGroup
-        title={`カテゴリ（${categories.length}）`}
-        options={CATEGORY_OPTIONS}
-        values={categories}
-        onChange={setCategories}
-      />
-
-      <ToggleGroup
-        title={`色（${colors.length}）`}
-        options={COLOR_OPTIONS}
-        values={colors}
-        onChange={setColors}
-      />
-
-      <ToggleGroup
-        title={`季節（${seasons.length}）`}
-        options={SEASON_OPTIONS}
-        values={seasons}
-        onChange={setSeasons}
-      />
-
-      <div style={{ marginTop: 12 }}>
-        <label style={{ fontWeight: 700 }}>画像</label>
-        <div style={{ marginTop: 6 }}>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
+        <div>
+          <label className="block text-sm font-semibold">画像</label>
+          <div className="mt-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-gray-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-800"
+            />
+          </div>
         </div>
+
+        <button
+          onClick={onSubmit}
+          className="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+        >
+          アップロード→登録
+        </button>
       </div>
 
-      <button
-        onClick={onSubmit}
-        style={{
-          marginTop: 16,
-          padding: "10px 16px",
-          border: "1px solid #333",
-          cursor: "pointer",
-        }}
-      >
-        アップロード→登録
-      </button>
-
-      <pre style={{ marginTop: 16, background: "#f6f6f6", padding: 12 }}>
+      {/* ログ */}
+      <pre className="mt-4 overflow-auto rounded-xl bg-gray-100 p-3 text-xs">
         {log}
       </pre>
 
+      {/* 作成結果 */}
       {created && (
-        <div style={{ marginTop: 16 }}>
-          <h2>作成結果</h2>
+        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+          <h2 className="text-base font-bold">作成結果</h2>
 
-          <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[240px_1fr]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageUrl(created.image_path)}
               alt={created.name}
-              width={240}
-              height={240}
-              style={{ border: "1px solid #ddd", objectFit: "cover" }}
+              className="h-60 w-full rounded-xl border object-cover"
             />
 
-            <pre style={{ background: "#f6f6f6", padding: 12, flex: 1 }}>
+            <pre className="overflow-auto rounded-xl bg-gray-100 p-3 text-xs">
               {JSON.stringify(created, null, 2)}
             </pre>
           </div>
-        </div>
+        </section>
       )}
+
+      {/* 一覧 */}
       {filtered.length > 0 && (
-        <section style={{ marginTop: 32 }}>
-          <h2>登録済みアイテム一覧</h2>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">      
-        {filtered.map((item) => (
-          <div key={item.id} className="border rounded-xl p-3 bg-white shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imageUrl(item.image_path)}
-              alt={item.name}
-              className="w-full h-40 object-cover rounded-lg"
-            />
-
-            <div className="mt-2 font-bold">{item.name}</div>
-            <div className="text-xs text-gray-600">{item.categories.join(", ")}</div>
-            <div className="text-xs text-gray-500">{item.seasons.join(", ")}</div>
-
-            <button
-              className="mt-2 text-sm px-3 py-1 rounded-lg border hover:bg-gray-50"
-              onClick={async () => {
-                await deleteItem(item.id);
-                setItems(await getItems());
-              }}
-            >
-              削除
-            </button>
+        <section className="mt-10">
+          <div className="flex items-end justify-between">
+            <h2 className="text-lg font-bold">登録済みアイテム一覧</h2>
+            <div className="text-xs text-gray-600">{filtered.length} 件</div>
           </div>
-        ))}
-      </div>
-    </section>
-  )}
-    </main>
-  );
+
+          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {filtered.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-2xl border bg-white p-3 shadow-sm transition hover:shadow-md"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imageUrl(item.image_path)}
+                  alt={item.name}
+                  className="h-40 w-full rounded-xl object-cover"
+                />
+
+                <div className="mt-2 font-semibold">{item.name}</div>
+                <div className="mt-1 text-xs text-gray-600">
+                  {item.categories.join(", ")}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {item.seasons.join(", ")}
+                </div>
+
+                <button
+                  className="mt-3 w-full rounded-xl border px-3 py-2 text-sm hover:bg-gray-50"
+                  onClick={async () => {
+                    await deleteItem(item.id);
+                    setItems(await getItems());
+                  }}
+                >
+                  削除
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </main>
+);
+
 }
