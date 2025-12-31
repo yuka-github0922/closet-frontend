@@ -263,56 +263,29 @@ const [filterColor, setFilterColor] = useState<string>("");
         <section style={{ marginTop: 32 }}>
           <h2>登録済みアイテム一覧</h2>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-            gap: 16,
-            marginTop: 12,
-          }}
-        >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">      
         {filtered.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              border: "1px solid #ddd",
-              padding: 8,
-              borderRadius: 8,
-            }}
-          >
+          <div key={item.id} className="border rounded-xl p-3 bg-white shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageUrl(item.image_path)}
               alt={item.name}
-              style={{
-                width: "100%",
-                height: 160,
-                objectFit: "cover",
-                borderRadius: 4,
-              }}
+              className="w-full h-40 object-cover rounded-lg"
             />
 
+            <div className="mt-2 font-bold">{item.name}</div>
+            <div className="text-xs text-gray-600">{item.categories.join(", ")}</div>
+            <div className="text-xs text-gray-500">{item.seasons.join(", ")}</div>
+
             <button
+              className="mt-2 text-sm px-3 py-1 rounded-lg border hover:bg-gray-50"
               onClick={async () => {
                 await deleteItem(item.id);
-                const latest = await getItems();
-                setItems(latest);
+                setItems(await getItems());
               }}
             >
               削除
             </button>
-
-            <div style={{ marginTop: 8, fontWeight: 700 }}>
-              {item.name}
-            </div>
-
-            <div style={{ fontSize: 12, color: "#555" }}>
-              {item.categories.join(", ")}
-            </div>
-
-            <div style={{ fontSize: 12, color: "#777" }}>
-              {item.seasons.join(", ")}
-            </div>
           </div>
         ))}
       </div>
