@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { uploadImage, createItem, imageUrl, deleteItem, type Item } from "@/lib/api";
+import { uploadImage, createItem, deleteItem, type Item } from "@/lib/api";
 
 import { useEffect } from "react";
 import { getItems } from "@/lib/api";
@@ -111,6 +111,7 @@ const [filterColor, setFilterColor] = useState<string>("");
 
       setLog("uploading...");
       const image_path = await uploadImage(file);
+      console.log("DEBUG uploaded:", image_path);
 
       setLog(`uploaded: ${image_path}\ncreating item...`);
       const item = await createItem({
@@ -134,6 +135,7 @@ const [filterColor, setFilterColor] = useState<string>("");
   if (filterCategory && !item.categories.includes(filterCategory)) return false;
   if (filterSeason && !item.seasons.includes(filterSeason)) return false;
   if (filterColor && !item.colors.includes(filterColor)) return false;
+  console.log(item);
   return true;
 });
 
@@ -269,11 +271,13 @@ return (
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[240px_1fr]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imageUrl(created.image_path)}
-              alt={created.name}
-              className="h-60 w-full rounded-xl border object-cover"
-            />
+            {created?.image_path && (
+              <img
+                src={created.image_path}
+                alt={created.name}
+                className="h-60 w-full rounded-xl border object-cover"
+              />
+            )}
 
             <pre className="overflow-auto rounded-xl bg-gray-100 p-3 text-xs">
               {JSON.stringify(created, null, 2)}
@@ -297,11 +301,13 @@ return (
                 className="rounded-2xl border bg-white p-3 shadow-sm transition hover:shadow-md"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imageUrl(item.image_path)}
-                  alt={item.name}
-                  className="h-40 w-full rounded-xl object-cover"
-                />
+                {item.image_path && (
+                  <img
+                    src={item.image_path}
+                    alt={item.name}
+                    className="h-40 w-full rounded-xl object-cover"
+                  />
+                )}
 
                 <div className="mt-2 font-semibold">{item.name}</div>
                 <div className="mt-1 text-xs text-gray-600">
