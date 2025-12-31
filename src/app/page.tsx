@@ -86,6 +86,10 @@ export default function Page() {
   const [seasons, setSeasons] = useState<string[]>(["winter"]);
   const [items, setItems] = useState<Item[]>([]);
 
+  const [filterCategory, setFilterCategory] = useState<string>("");
+const [filterSeason, setFilterSeason] = useState<string>("");
+const [filterColor, setFilterColor] = useState<string>("");
+
   const [file, setFile] = useState<File | null>(null);
   const [created, setCreated] = useState<Item | null>(null);
   const [log, setLog] = useState("");
@@ -126,9 +130,39 @@ export default function Page() {
     }
   };
 
+  const filtered = items.filter((item) => {
+  if (filterCategory && !item.categories.includes(filterCategory)) return false;
+  if (filterSeason && !item.seasons.includes(filterSeason)) return false;
+  if (filterColor && !item.colors.includes(filterColor)) return false;
+  return true;
+});
+
   return (
     <main style={{ padding: 24, fontFamily: "sans-serif", maxWidth: 720 }}>
       <h1>Closet MVP</h1>
+      <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+          <option value="">カテゴリ：全部</option>
+          <option value="outer">outer</option>
+          <option value="tops">tops</option>
+          <option value="bottoms">bottoms</option>
+        </select>
+
+        <select value={filterSeason} onChange={(e) => setFilterSeason(e.target.value)}>
+          <option value="">季節：全部</option>
+          <option value="spring">spring</option>
+          <option value="summer">summer</option>
+          <option value="autumn">autumn</option>
+          <option value="winter">winter</option>
+        </select>
+
+        <select value={filterColor} onChange={(e) => setFilterColor(e.target.value)}>
+          <option value="">色：全部</option>
+          <option value="black">black</option>
+          <option value="white">white</option>
+          <option value="navy">navy</option>
+        </select>
+      </div>
 
       <div style={{ marginTop: 12 }}>
         <label style={{ display: "block", fontWeight: 700 }}>名前</label>
@@ -225,66 +259,65 @@ export default function Page() {
           </div>
         </div>
       )}
-      {items.length > 0 && (
-  <section style={{ marginTop: 32 }}>
-    <h2>登録済みアイテム一覧</h2>
+      {filtered.length > 0 && (
+        <section style={{ marginTop: 32 }}>
+          <h2>登録済みアイテム一覧</h2>
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap: 16,
-        marginTop: 12,
-      }}
-    >
-      {items.map((item) => (
         <div
-          key={item.id}
           style={{
-            border: "1px solid #ddd",
-            padding: 8,
-            borderRadius: 8,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gap: 16,
+            marginTop: 12,
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={imageUrl(item.image_path)}
-            alt={item.name}
+        {filtered.map((item) => (
+          <div
+            key={item.id}
             style={{
-              width: "100%",
-              height: 160,
-              objectFit: "cover",
-              borderRadius: 4,
-            }}
-          />
-
-          <button
-            onClick={async () => {
-              await deleteItem(item.id);
-              const latest = await getItems();
-              setItems(latest);
+              border: "1px solid #ddd",
+              padding: 8,
+              borderRadius: 8,
             }}
           >
-            削除
-          </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageUrl(item.image_path)}
+              alt={item.name}
+              style={{
+                width: "100%",
+                height: 160,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+            />
 
-          <div style={{ marginTop: 8, fontWeight: 700 }}>
-            {item.name}
+            <button
+              onClick={async () => {
+                await deleteItem(item.id);
+                const latest = await getItems();
+                setItems(latest);
+              }}
+            >
+              削除
+            </button>
+
+            <div style={{ marginTop: 8, fontWeight: 700 }}>
+              {item.name}
+            </div>
+
+            <div style={{ fontSize: 12, color: "#555" }}>
+              {item.categories.join(", ")}
+            </div>
+
+            <div style={{ fontSize: 12, color: "#777" }}>
+              {item.seasons.join(", ")}
+            </div>
           </div>
-
-          <div style={{ fontSize: 12, color: "#555" }}>
-            {item.categories.join(", ")}
-          </div>
-
-          <div style={{ fontSize: 12, color: "#777" }}>
-            {item.seasons.join(", ")}
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
-
+        ))}
+      </div>
+    </section>
+  )}
     </main>
   );
 }
