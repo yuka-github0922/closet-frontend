@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { uploadImage, createItem, deleteItem, type Item } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
-import { useEffect } from "react";
 import { getItems } from "@/lib/api";
 // ★ backendのEnum値に合わせる（ここ超大事）
 // 例：あなたのEnum定義に合わせて増やしてOK
@@ -139,7 +139,100 @@ const [filterColor, setFilterColor] = useState<string>("");
   return true;
 });
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [authMsg, setAuthMsg] = useState("");
+
+
+useEffect(() => {
+  // 初回
+  supabase.auth.getUser().then(({ data }) => {
+    setUserEmail(data.user?.email ?? null);
+  });
+
+  // 変化監視
+  const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUserEmail(session?.user?.email ?? null);
+  });
+
+  return () => sub.subscription.unsubscribe();
+}, []);
+
+
+
+
+useEffect(() => {
+  (async () => {
+    const { data } = await supabase.auth.getSession();
+    setLog((prev) => prev + `\n\nsession: ${data.session?.user?.email ?? "none"}`);
+  })();
+}, []);
+
+  const signUp = async () => {
+    setAuthMsg("...");
+    const { error } = await supabase.auth.signUp({ email, password });
+    setAuthMsg(error ? error.message : "サインアップOK（そのままログインできるはず）");
+  };
+
+  const signIn = async () => {
+    setAuthMsg("...");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setAuthMsg(error ? error.message : "ログインOK");
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setAuthMsg("ログアウトしました");
+  };
+
+
+    if (!userEmail) {
+    return (
+      <main className="mx-auto max-w-md p-6">
+        <h1 className="text-2xl font-bold">Closet Login</h1>
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-gray-600">ログイン中：{userEmail}</div>
+          <button
+            className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100"
+            onClick={signOut}
+          >
+            Logout
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <input
+            className="w-full rounded-lg border px-3 py-2"
+            placeholder="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="w-full rounded-lg border px-3 py-2"
+            placeholder="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <div className="flex gap-2">
+            <button className="rounded-lg border px-3 py-2" onClick={signUp}>
+              新規登録
+            </button>
+            <button className="rounded-lg border px-3 py-2" onClick={signIn}>
+              ログイン
+            </button>
+          </div>
+
+          {authMsg && <p className="text-sm text-gray-600">{authMsg}</p>}
+        </div>
+      </main>
+    );
+  }
+
 return (
+  
   <main className="min-h-screen bg-gray-50">
     <div className="mx-auto max-w-3xl p-6 font-sans">
       <h1 className="text-2xl font-bold">Closet</h1>
