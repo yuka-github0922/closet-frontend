@@ -93,12 +93,18 @@ const [filterColor, setFilterColor] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [created, setCreated] = useState<Item | null>(null);
   const [log, setLog] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [authMsg, setAuthMsg] = useState("");
+  const [user, setUser] = useState<{ id: string; email: string | null } | null>(null);
 
   useEffect(() => {
-  getItems()
+    if (!user) return;
+
+getItems(user.id)
     .then(setItems)
-    .catch((e) => setLog(`load error: ${e.message}`));
-}, []);
+    .catch((e) => setLog(`load error: ${e.message}`));}, [user]);
 
   const onSubmit = async () => {
     try {
@@ -122,12 +128,13 @@ const [filterColor, setFilterColor] = useState<string>("");
         size,
         material,
         image_path,
+        owner_id: user?.id || "", 
       });
 
       setCreated(item);
       setLog("done!");
-    } catch (e: any) {
-      setLog(`error: ${e?.message ?? String(e)}`);
+    } catch (e: unknown) {
+      setLog(`error: ${(e as Error)?.message ?? String(e)}`);
     }
   };
 
@@ -139,28 +146,19 @@ const [filterColor, setFilterColor] = useState<string>("");
   return true;
 });
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [authMsg, setAuthMsg] = useState("");
-
-
 useEffect(() => {
-  // 初回
   supabase.auth.getUser().then(({ data }) => {
-    setUserEmail(data.user?.email ?? null);
+    const u = data.user;
+    setUser(u ? { id: u.id, email: u.email ?? null } : null);
   });
 
-  // 変化監視
   const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-    setUserEmail(session?.user?.email ?? null);
+    const u = session?.user;
+    setUser(u ? { id: u.id, email: u.email ?? null } : null);
   });
 
   return () => sub.subscription.unsubscribe();
 }, []);
-
-
-
 
 useEffect(() => {
   (async () => {
@@ -169,12 +167,34 @@ useEffect(() => {
   })();
 }, []);
 
-  const signUp = async () => {
-    setAuthMsg("...");
-    const { error } = await supabase.auth.signUp({ email, password });
-    setAuthMsg(error ? error.message : "サインアップOK（そのままログインできるはず）");
-  };
+const signUp = async () => {
+  try {
+    setAuthMsg("signing up...");
 
+    console.log("SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log("SUPABASE_ANON_KEY exists", !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    console.log("signUp data:", data);
+    console.log("signUp error:", error);
+    console.log("URL =", process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log("KEY exists =", !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+    if (error) {
+      setAuthMsg(`error: ${error.message}`);
+      return;
+    }
+
+    setAuthMsg("サインアップ成功");
+  } catch (e) {
+    console.error("signUp catch:", e);
+    setAuthMsg(`catch: ${e instanceof Error ? e.message : String(e)}`);
+  }
+};
   const signIn = async () => {
     setAuthMsg("...");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -187,20 +207,10 @@ useEffect(() => {
   };
 
 
-    if (!userEmail) {
+    if (!user) {
     return (
       <main className="mx-auto max-w-md p-6">
         <h1 className="text-2xl font-bold">Closet Login</h1>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-600">ログイン中：{userEmail}</div>
-          <button
-            className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100"
-            onClick={signOut}
-          >
-            Logout
-          </button>
-        </div>
-
         <div className="mt-4 space-y-3">
           <input
             className="w-full rounded-lg border px-3 py-2"
@@ -413,8 +423,8 @@ return (
                 <button
                   className="mt-3 w-full rounded-xl border px-3 py-2 text-sm hover:bg-gray-50"
                   onClick={async () => {
-                    await deleteItem(item.id);
-                    setItems(await getItems());
+  await deleteItem(item.id);
+setItems(await getItems(user.id));
                   }}
                 >
                   削除

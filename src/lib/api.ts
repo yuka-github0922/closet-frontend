@@ -9,6 +9,7 @@ export type Item = {
   size?: string;
   material?: string;
   image_path: string;
+  owner_id: string;
 };
 
 export async function uploadImage(file: File): Promise<string> {
@@ -32,8 +33,8 @@ export async function createItem(body: Omit<Item, "id">) {
   return (await res.json()) as Item;
 }
 
-export async function getItems(): Promise<Item[]> {
-  const res = await fetch(`${API_BASE}/items`);
+export async function getItems(owner_id: string): Promise<Item[]> {
+  const res = await fetch(`${API_BASE}/items?owner_id=${encodeURIComponent(owner_id)}`);
   if (!res.ok) throw new Error(await res.text());
   return (await res.json()) as Item[];
 }
