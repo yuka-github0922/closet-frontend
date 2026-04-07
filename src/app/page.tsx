@@ -102,9 +102,10 @@ const [filterColor, setFilterColor] = useState<string>("");
   useEffect(() => {
     if (!user) return;
 
-getItems(user.id)
-    .then(setItems)
-    .catch((e) => setLog(`load error: ${e.message}`));}, [user]);
+    getItems(user.id)
+      .then(setItems)
+      .catch((e) => setLog(`load error: ${e.message}`));
+  }, [user]);
 
   const onSubmit = async () => {
     try {
@@ -423,8 +424,8 @@ return (
                 <button
                   className="mt-3 w-full rounded-xl border px-3 py-2 text-sm hover:bg-gray-50"
                   onClick={async () => {
-  await deleteItem(item.id);
-setItems(await getItems(user.id));
+                    await deleteItem(item.id);
+                    setItems(await getItems(user.id));
                   }}
                 >
                   削除
