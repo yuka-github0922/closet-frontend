@@ -246,6 +246,17 @@ return (
   
   <main className="min-h-screen bg-gray-50">
     <div className="mx-auto max-w-3xl p-6 font-sans">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="text-sm text-gray-600">
+          ログイン中：{user.email}
+        </div>
+        <button
+          className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100"
+          onClick={signOut}
+        >
+          Logout
+        </button>
+      </div>
       <h1 className="text-2xl font-bold">Closet</h1>
       <p className="mt-1 text-sm text-gray-600">画像で服を管理するミニアプリ</p>
 
