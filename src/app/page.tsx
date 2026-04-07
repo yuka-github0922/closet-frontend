@@ -11,7 +11,11 @@ const CATEGORY_OPTIONS = [
   { value: "outer", label: "アウター" },
   { value: "tops", label: "トップス" },
   { value: "bottoms", label: "ボトムス" },
+  { value: "dress", label: "ワンピース" },
+  { value: "bag", label: "バッグ" },
   { value: "shoes", label: "シューズ" },
+  { value: "accessory", label: "アクセサリー" },
+  { value: "other", label: "その他" },
 ] as const;
 
 const COLOR_OPTIONS = [
@@ -19,6 +23,15 @@ const COLOR_OPTIONS = [
   { value: "white", label: "白" },
   { value: "beige", label: "ベージュ" },
   { value: "navy", label: "ネイビー" },
+  { value: "gray", label: "グレー" },
+  { value: "red", label: "赤" },
+  { value: "blue", label: "青" },
+  { value: "yellow", label: "黄" },
+  { value: "green", label: "緑" },
+  { value: "purple", label: "紫" },
+  { value: "pink", label: "ピンク" },
+  { value: "brown", label: "茶" },
+  { value: "other", label: "その他" },
 ] as const;
 
 const SEASON_OPTIONS = [
@@ -260,43 +273,6 @@ return (
       <h1 className="text-2xl font-bold">Closet</h1>
       <p className="mt-1 text-sm text-gray-600">画像で服を管理するミニアプリ</p>
 
-      {/* フィルタ */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        <select
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-          className="rounded-lg border bg-white px-3 py-2 text-sm"
-        >
-          <option value="">カテゴリ：全部</option>
-          <option value="outer">outer</option>
-          <option value="tops">tops</option>
-          <option value="bottoms">bottoms</option>
-        </select>
-
-        <select
-          value={filterSeason}
-          onChange={(e) => setFilterSeason(e.target.value)}
-          className="rounded-lg border bg-white px-3 py-2 text-sm"
-        >
-          <option value="">季節：全部</option>
-          <option value="spring">spring</option>
-          <option value="summer">summer</option>
-          <option value="autumn">autumn</option>
-          <option value="winter">winter</option>
-        </select>
-
-        <select
-          value={filterColor}
-          onChange={(e) => setFilterColor(e.target.value)}
-          className="rounded-lg border bg-white px-3 py-2 text-sm"
-        >
-          <option value="">色：全部</option>
-          <option value="black">black</option>
-          <option value="white">white</option>
-          <option value="navy">navy</option>
-        </select>
-      </div>
-
       {/* 入力フォーム */}
       <div className="mt-6 space-y-4 rounded-2xl border bg-white p-5 shadow-sm">
         <div>
@@ -374,11 +350,6 @@ return (
         </button>
       </div>
 
-      {/* ログ */}
-      <pre className="mt-4 overflow-auto rounded-xl bg-gray-100 p-3 text-xs">
-        {log}
-      </pre>
-
       {/* 作成結果 */}
       {created && (
         <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
@@ -400,6 +371,71 @@ return (
           </div>
         </section>
       )}
+
+      {/* フィルタ */}
+      <div className="mt-6 rounded-2xl border bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">絞り込み</h2>
+            <p className="text-xs text-gray-500">
+              カテゴリ・季節・色で絞り込めます
+            </p>
+          </div>
+
+          <button
+            className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
+            onClick={() => {
+              setFilterCategory("");
+              setFilterSeason("");
+              setFilterColor("");
+            }}
+          >
+            絞り込み解除
+          </button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+          >
+            <option value="">カテゴリ：すべて</option>
+            <option value="outer">アウター</option>
+            <option value="tops">トップス</option>
+            <option value="bottoms">ボトムス</option>
+            <option value="shoes">シューズ</option>
+          </select>
+
+          <select
+            value={filterSeason}
+            onChange={(e) => setFilterSeason(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+          >
+            <option value="">季節：すべて</option>
+            <option value="spring">春</option>
+            <option value="summer">夏</option>
+            <option value="autumn">秋</option>
+            <option value="winter">冬</option>
+          </select>
+
+          <select
+            value={filterColor}
+            onChange={(e) => setFilterColor(e.target.value)}
+            className="rounded-lg border px-3 py-2 text-sm"
+          >
+            <option value="">色：すべて</option>
+            <option value="black">黒</option>
+            <option value="white">白</option>
+            <option value="beige">ベージュ</option>
+            <option value="navy">ネイビー</option>
+          </select>
+        </div>
+
+        <div className="mt-3 text-xs text-gray-500">
+          {filtered.length} 件ヒット
+        </div>
+      </div>
 
       {/* 一覧 */}
       {filtered.length > 0 && (
